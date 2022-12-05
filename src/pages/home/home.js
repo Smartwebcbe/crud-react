@@ -8,24 +8,27 @@ export class Home extends React.Component {
     constructor(props) {
         super(props)
         this.validator = new SimpleReactValidator({
-            className:"text-danger"
+            className: "text-danger"
         });
         this.state = {
+            isEditIndex:-1,
             userformobj: {
                 name: "",
                 age: "",
                 dob: "",
                 email: "",
-                phone: ""
+                phone: "",
+                status:""
             },
 
             userlist: [
                 {
                     name: "Vijay",
                     age: "13",
-                    dob: "2000/10/10",
+                    dob: "10/10/2002",
                     email: "test@gmail.com",
-                    phone: "9876543210"
+                    phone: "9876543210",
+                    status:"1"
                 }
             ]
 
@@ -49,22 +52,39 @@ export class Home extends React.Component {
     handleformsubmit = () => {
         if (this.validator.allValid()) {
             console.log(this.state.userformobj);
-            let userlist=[...this.state.userlist, this.state.userformobj];
-            this.setState({userlist:userlist});
-            let userformobj= {
+            let userlist=[];
+            if(this.state.isEditIndex !==-1){
+            this.state.userlist[this.state.isEditIndex]= this.state.userformobj;
+            userlist=this.state.userlist;
+            }else{
+             userlist=[...this.state.userlist, this.state.userformobj];
+            }
+            
+            let userformobj = {
                 name: "",
                 age: "",
                 dob: "",
                 email: "",
-                phone: ""
+                phone: "",
+                status:""
             }
-            this.setState({userformobj:userformobj});
-          } else {
+            this.setState({ userlist:userlist, userformobj: userformobj, isEditIndex:-1 });
+        } else {
             this.validator.showMessages();
             // re-render the UI to show alert messages
             this.forceUpdate();
             //alert("Fill all the fields");
-          }
+        }
+    }
+
+    handleformEdit = (data,i) => {
+        console.log(data,i);
+        this.setState({ userformobj: data, isEditIndex:i })
+    }
+
+    handleformDelete=(i)=>{
+        this.state.userlist.splice(i,1);
+        this.setState({userformobj:this.state.userlist})
     }
 
     render() {
@@ -115,6 +135,15 @@ export class Home extends React.Component {
                                             {this.validator.message('phone', this.state.userformobj.phone, 'required')}
                                         </div>
                                     </div>
+                                    <div className="col-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">Status</label>
+                                            <select class="form-select" value={this.state.userformobj.status} id="status" onChange={this.handleformvalue}>
+                                                <option value="1">Active</option>
+                                                <option value="2">Suspend</option>                                            </select>
+                                            {this.validator.message('select', this.state.userformobj.phone, 'required')}
+                                        </div>
+                                    </div>
 
                                 </div>
                                 <div className="row"><div className="col-6">
@@ -142,23 +171,27 @@ export class Home extends React.Component {
                                             <th scope="col">DOB</th>
                                             <th scope="col">Email</th>
                                             <th scope="col">Phone</th>
+                                            <th scope="col">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {
-                                            this.state.userlist.map((data)=>
-                                            <tr>
-                                            <th scope="row">1</th>
-                                            <td>{data.name}</td>
-                                            <td>{data.age}</td>
-                                            <td>{data.dob}</td>
-                                            <td>{data.email}</td>
-                                            <td>{data.phone}</td>
-                                        </tr>
+                                            this.state.userlist.map((data,i) =>
+                                                <tr>
+                                                    <th scope="row">1</th>
+                                                    <td>{data.name}</td>
+                                                    <td>{data.age}</td>
+                                                    <td>{data.dob}</td>
+                                                    <td>{data.email}</td>
+                                                    <td>{data.phone}</td>
+                                                    <td className={data.status==1?"text-primary":"text-danger"}>{data.status==1?"Active":"Suspended"}</td>
+                                                    <td><button type="button" className="btn btn-primary" onClick={() => this.handleformEdit(data,i)}>Edit</button></td>
+                                                    <td><button type="button" className="btn btn-danger" onClick={() => this.handleformDelete(data,i)}>Delete</button></td>
+                                                </tr>
 
                                             )
                                         }
-                                        
+
                                     </tbody>
                                 </table>
 
