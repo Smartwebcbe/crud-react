@@ -1,10 +1,15 @@
 import React from "react";
+import SimpleReactValidator from 'simple-react-validator';
+
 
 
 export class Home extends React.Component {
 
     constructor(props) {
         super(props)
+        this.validator = new SimpleReactValidator({
+            className:"text-danger"
+        });
         this.state = {
             userformobj: {
                 name: "",
@@ -42,17 +47,24 @@ export class Home extends React.Component {
     }
 
     handleformsubmit = () => {
-        console.log(this.state.userformobj);
-        let userlist=[...this.state.userlist, this.state.userformobj];
-        this.setState({userlist:userlist});
-        let userformobj= {
-            name: "",
-            age: "",
-            dob: "",
-            email: "",
-            phone: ""
-        }
-        this.setState({userformobj:userformobj});
+        if (this.validator.allValid()) {
+            console.log(this.state.userformobj);
+            let userlist=[...this.state.userlist, this.state.userformobj];
+            this.setState({userlist:userlist});
+            let userformobj= {
+                name: "",
+                age: "",
+                dob: "",
+                email: "",
+                phone: ""
+            }
+            this.setState({userformobj:userformobj});
+          } else {
+            this.validator.showMessages();
+            // re-render the UI to show alert messages
+            this.forceUpdate();
+            //alert("Fill all the fields");
+          }
     }
 
     render() {
@@ -69,12 +81,14 @@ export class Home extends React.Component {
                                         <div className="mb-3">
                                             <label className="form-label">Name</label>
                                             <input type="text" className="form-control" value={this.state.userformobj.name} id="name" onChange={this.handleformvalue} placeholder="Name" />
+                                            {this.validator.message('name', this.state.userformobj.name, 'required')}
                                         </div>
                                     </div>
                                     <div className="col-6">
                                         <div className="mb-3">
                                             <label className="form-label">Age</label>
                                             <input type="number" className="form-control" value={this.state.userformobj.age} id="age" onChange={this.handleformvalue} placeholder="Age" />
+                                            {this.validator.message('age', this.state.userformobj.age, 'required|numeric|min:10,num')}
                                         </div>
                                     </div>
 
@@ -82,6 +96,7 @@ export class Home extends React.Component {
                                         <div className="mb-3">
                                             <label className="form-label">DOB</label>
                                             <input type="date" className="form-control" value={this.state.userformobj.dob} id="dob" onChange={this.handleformvalue} placeholder="DOB" />
+                                            {this.validator.message('dob', this.state.userformobj.dob, 'required')}
                                         </div>
                                     </div>
 
@@ -89,6 +104,7 @@ export class Home extends React.Component {
                                         <div className="mb-3">
                                             <label className="form-label">Email</label>
                                             <input type="text" className="form-control" value={this.state.userformobj.email} id="email" onChange={this.handleformvalue} placeholder="Email" />
+                                            {this.validator.message('email', this.state.userformobj.email, 'required|email')}
                                         </div>
                                     </div>
 
@@ -96,6 +112,7 @@ export class Home extends React.Component {
                                         <div className="mb-3">
                                             <label className="form-label">Phone</label>
                                             <input type="number" className="form-control" value={this.state.userformobj.phone} id="phone" onChange={this.handleformvalue} placeholder="Phone" />
+                                            {this.validator.message('phone', this.state.userformobj.phone, 'required')}
                                         </div>
                                     </div>
 
